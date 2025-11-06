@@ -1,0 +1,32 @@
+PandA IR — Part 5 (File I/O + JSON data + Search Mode)
+Type :help for commands. Type :quit to exit.
+
+> love summer
+1 out of 3 sonnets contain "love summer".
+
+[1/3] Sonnet 18: Shall I compare thee to a \x1b[1m\x1b[43msummer\x1b[0m's day?
+  [ 1] Shall I compare thee to a \x1b[1m\x1b[43msummer\x1b[0m's day?
+  [ 2] Thou art more \x1b[1m\x1b[43mlove\x1b[0mly and more temperate:
+  [ 4] And \x1b[1m\x1b[43msummer\x1b[0m's lease hath all too short a date:
+  [ 9] But thy eternal \x1b[1m\x1b[43msummer\x1b[0m shall not fade,
+> love war
+0 out of 3 sonnets contain "love war".
+> :search-mode OR
+Search mode set to OR
+> love wire
+3 out of 3 sonnets contain "love wire".
+
+[1/3] Sonnet 18: Shall I compare thee to a summer's day?
+  [ 2] Thou art more \x1b[1m\x1b[43mlove\x1b[0mly and more temperate:
+
+[2/3] Sonnet 29: When in disgrace with fortune and men's eyes
+  [13] For thy sweet \x1b[1m\x1b[43mlove\x1b[0m remember'd such wealth brings
+
+[3/3] Sonnet 130: My mistress' eyes are nothing like the sun
+  [ 4] If hairs be \x1b[1m\x1b[43mwire\x1b[0ms, black \x1b[1m\x1b[43mwire\x1b[0ms grow on her head.
+  [ 9] I \x1b[1m\x1b[43mlove\x1b[0m to hear her speak, yet well I know
+  [13] And yet by heaven, I think my \x1b[1m\x1b[43mlove\x1b[0m as rare,
+> :search-mode NOT
+Usage: :search-mode AND|OR
+> :quit
+Bye.
