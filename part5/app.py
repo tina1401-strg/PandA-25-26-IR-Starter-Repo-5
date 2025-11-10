@@ -10,6 +10,7 @@ BUT:
 - Keep the Exercise 4 "search mode" concept (AND/OR)
 
 """
+from selectors import SelectSelector
 from typing import List, Dict, Any
 import json
 import os
@@ -121,43 +122,51 @@ def module_relative_path(name: str) -> str:
 # Replace the placeholder function with code that opens part5/sonnets.json and loads it.
 # Keep the same in-memory structure as before: a list of dicts with keys "title" and "lines".
 def load_sonnets() -> List[Dict[str, object]]:
-    """ToDo 1: Read part5/sonnets.json via file I/O and return the data.
+    with open(module_relative_path("sonnets.json"), "r", encoding="utf-8") as f:
+        sonnets = json.load(f)
 
-    Hints:
-      - Use module_relative_path(...) to get a filename relative to this module.
-      - Open the file with utf-8 encoding
-      - Use json.load(fileobj)
-    """
-    # BEGIN
-    return {}
-    # END
+    return sonnets
+
 
 CONFIG_DEFAULTS = { "highlight": True, "search_mode": "AND" }
 
 def load_config() -> Dict[str, object]:
-    """ToDo 2: Read config.json if present, otherwise fall back to CONFIG_DEFAULTS.
+    config = {}
+    path = module_relative_path("config.json")
 
-    Requirements:
-      - Use module_relative_path(...) to get a filename relative to this module to read from
-      - Read with utf-8
-      - If the file does not exist, return CONFIG_DEFAULTS.
-      - If it exists, JSON-decode it and validate keys, falling back to the defaults in CONFIG_DEFAULTS for missing keys.
-    """
-    # BEGIN
-    return dict(CONFIG_DEFAULTS)
-    # END
+    if os.path.isfile(path):
+        with open(module_relative_path("config.json"), "r", encoding="utf-8") as f:
+            try:
+                tmp = json.load(f)
+            except json.decoder.JSONDecodeError:
+                tmp = {}
+    else:
+        return CONFIG_DEFAULTS
+
+    for x in CONFIG_DEFAULTS.keys():
+        if x in tmp:
+            config[x] = tmp[x]
+        else:
+            config[x] = CONFIG_DEFAULTS[x]
+
+    return config
 
 def save_config(cfg: Dict[str, object]) -> None:
-    """ToDo 3: Write cfg to config.json using json.dump (pretty-print it).
+    tmp = {}
+    path = module_relative_path("config.json")
 
-    Requirements:
-      - Use module_relative_path(...) to get a filename relative to this module to write to
-      - Write with utf-8
-      - Use indent=2 and ensure_ascii=False
-    """
-    # BEGIN
-    pass
-    # END
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            try:
+                tmp = json.load(f)
+            except json.decoder.JSONDecodeError:
+                tmp = {}
+
+        for x in cfg.keys():
+            tmp[x] = cfg[x]
+
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(json.dumps(tmp, indent=2, ensure_ascii=False))
 
 def main() -> None:
 
@@ -191,12 +200,23 @@ def main() -> None:
                 if len(parts) == 2 and parts[1].lower() in ("on", "off"):
                     config["highlight"] = (parts[1].lower() == "on")
                     print("Highlighting", "ON" if config["highlight"] else "OFF")
-                    # ToDo 3: Use save_config(...) to write the config.json file when the highlight setting changes
+                    # DONE; ToDo 3: Use save_config(...) to write the config.json file when the highlight setting changes
+                    save_config(config)
                 else:
                     print("Usage: :highlight on|off")
                 continue
-
-            # ToDo 0 - Copy (and adapt) your implementation of the search mode CLI from part 4 of the exercise
+            # DONE; ToDo 0 - Copy (and adapt) your implementation of the search mode CLI from part 4 of the exercise
+            if raw.startswith(":search-mode"):
+                parts = raw.split()
+                if len(parts) == 2 and parts[1].upper() in ("AND", "OR"):
+                    config["search_mode"] = parts[1].upper()
+                    print("Search mode set to", "AND" if config["search_mode"] == "AND" else "OR")
+                    save_config(config)
+                else:
+                    print("Usage: :search-mode AND|OR")
+                continue
+            print("Unknown command. Type :help for commands.")
+            continue
 
             print("Unknown command. Type :help for commands.")
             continue
@@ -220,7 +240,7 @@ def main() -> None:
                     combined_result = combined_results[i]
                     result = results[i]
 
-                    # ToDo 0 - Copy your implementation of the search mode from part 4 of the exercise
+                    # DONE; ToDo 0 - Copy your implementation of the search mode from part 4 of the exercise
                     if config["search_mode"] == "AND":
                         if combined_result["matches"] > 0 and result["matches"] > 0:
                             # Only if we have matches in both results, we consider the sonnet (logical AND!)
@@ -228,6 +248,8 @@ def main() -> None:
                         else:
                             # Not in both. No match!
                             combined_result["matches"] = 0
+                    else:
+                        combined_results[i] = combine_results(combined_result, result)
 
         print_results(raw, combined_results, bool(config["highlight"]))
 
