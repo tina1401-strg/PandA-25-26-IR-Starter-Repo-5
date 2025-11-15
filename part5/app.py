@@ -122,7 +122,9 @@ def module_relative_path(name: str) -> str:
 # Replace the placeholder function with code that opens part5/sonnets.json and loads it.
 # Keep the same in-memory structure as before: a list of dicts with keys "title" and "lines".
 def load_sonnets() -> List[Dict[str, object]]:
-    with open(module_relative_path("sonnets.json"), "r", encoding="utf-8") as f:
+    path = module_relative_path("_sonnets.json")
+
+    with open(path, "r", encoding="utf-8") as f:
         sonnets = json.load(f)
 
     return sonnets
@@ -133,21 +135,22 @@ CONFIG_DEFAULTS = { "highlight": True, "search_mode": "AND" }
 def load_config() -> Dict[str, object]:
     config = {}
     path = module_relative_path("config.json")
+    config_defaults = dict(CONFIG_DEFAULTS)
 
     if os.path.isfile(path):
-        with open(module_relative_path("config.json"), "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             try:
                 tmp = json.load(f)
             except json.decoder.JSONDecodeError:
                 tmp = {}
     else:
-        return CONFIG_DEFAULTS
+        return config_defaults
 
-    for x in CONFIG_DEFAULTS.keys():
+    for x in config_defaults.keys():
         if x in tmp:
             config[x] = tmp[x]
         else:
-            config[x] = CONFIG_DEFAULTS[x]
+            config[x] = config_defaults[x]
 
     return config
 
@@ -218,8 +221,6 @@ def main() -> None:
             print("Unknown command. Type :help for commands.")
             continue
 
-            print("Unknown command. Type :help for commands.")
-            continue
 
         # query
         combined_results = []
